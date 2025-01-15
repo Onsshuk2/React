@@ -1,0 +1,93 @@
+h1 {
+    color: #333;
+  }
+  
+  p {
+    color: #555;
+  }
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    /* для шекспіра */
+    /* background-image: url(https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/William_Shakespeare_by_John_Taylor.jpg/1200px-William_Shakespeare_by_John_Taylor.jpg); */
+  }
+  
+  .App {
+    text-align: center;
+    margin-top: 50px;
+   
+    /* для шекспіра */
+    /* background-image: url(https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/William_Shakespeare_by_John_Taylor.jpg/1200px-William_Shakespeare_by_John_Taylor.jpg); */
+  }
+  
+  .recipe {
+    background-color: #fff;
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 8px;
+    width: 60%;
+    box-shadow: 4px 8px 10px rgba(2, 2, 2, 0.6);
+    
+  }
+  
+  .recipe h2 {
+    color: #333;
+  }
+  
+  .recipe h3 {
+    color: #555;
+  }
+  
+   ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .recipe li {
+    padding: 5px 0;
+  }
+  
+  .recipe-image {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 8px;
+    margin-top: 20px;
+    box-shadow: 4px 8px 10px rgba(2, 2, 2, 0.6);
+  }
+
+  .shakespeare-info {
+    background-color: #e1d5d5;
+    padding: 20px;
+    margin: 20px auto;
+    width: 80%;
+    max-width: 800px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(81, 1, 50, 0.8);
+  }
+  
+  .plays-list {
+    background-color: #fff;
+    padding: 20px;
+    margin: 20px auto;
+    width: 80%;
+    max-width: 800px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 3, 3, 0.8);
+
+    
+  }
+  
+  .play-details {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #e8cece;
+    border-radius: 4px;
+    
+  }
+  
+  h2, h3, h4 {
+    color: #000000;
+  }
+  
+  
