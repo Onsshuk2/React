@@ -23,7 +23,7 @@ const DefaultLayout = () => {
     return (
         <>
             <Navbar isDark={theme === "dark"} themeHandler={changeThemeHanlder} />
-            <Container>
+            <Container sx={{minHeight: "100vh"}}>
                 <Outlet/>
             </Container>
             <Footer/>

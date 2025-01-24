@@ -4,18 +4,28 @@ import { Box, Typography } from "@mui/material";
 const Footer = ({ isDark }) => {
     return (
         <Box
-            component="footer"
             sx={{
-                backgroundColor: isDark ? "black" : "pink", // для футера
-                color: isDark ? "white" : "black", // для футера
-                textAlign: "center",
-                py: 2, 
-                position: "absolute",
-                bottom: 0,
-                width: "100%",
+                display: "flex",
+                flexDirection: "column",
+                minHeight: "100vh", 
             }}
         >
-            <Typography variant="body1">© 2025 My Awesome Website</Typography>
+            <Box sx={{ flex: 1 }}>
+               
+            </Box>
+
+            <Box
+                component="footer"
+                sx={{
+                    backgroundColor: isDark ? "black" : "pink", 
+                    color: isDark ? "white" : "black", 
+                    textAlign: "center",
+                    py: 2,
+                    position: "relative", 
+                }}
+            >
+                <Typography variant="body1">© 2025 My Awesome Website</Typography>
+            </Box>
         </Box>
     );
 };

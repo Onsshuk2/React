@@ -1,141 +1,166 @@
-import { 
-    Container, 
-    Typography, 
-    TextField, 
-    Link, 
-    FormControl, 
-    FormLabel, 
-    Divider,
-    Button,
-    Box 
-} from "@mui/material";
 import { useFormik } from "formik";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from "@mui/material";
 
+const RegistrationForm = () => {
+  const navigate = useNavigate();
 
-const RegisterPage = () => {
-    const formSubmit = (values) => {
-        delete values.confirmPassword;
+  const roles = ["user", "admin"];
 
-        const users = localStorage.getItem("users");
-        if (!users) {
-            localStorage.setItem("users", JSON.stringify([{ ...values, id: 1 }]));
-        } else {
-            const array = JSON.parse(users);
-            values.id = array[array.length - 1].id + 1;
-            array.push(values);
-            localStorage.setItem("users", JSON.stringify(array));
-        }
-    };
+  const yupValidationScheme = Yup.object({
+    firstName: Yup.string().max(50, "Максимальна довжина 50 символів"),
+    lastName: Yup.string().max(50, "Максимальна довжина 50 символів"),
+    email: Yup.string().email("Невірний формат пошти").required("Обов'язкове поле"),
+    password: Yup.string().min(6, "Мінімальна довжина паролю 6 символів"),
+    confirmPassword: Yup.string().oneOf([Yup.ref("password")], "Паролі не збігаються"),
+    image: Yup.string(),
+    role: Yup.string()
+      .oneOf(["user", "admin"], "Невірна роль")
+      .required("Роль обов'язкова"),
+  });
 
-    const initValues = {
-        firstName: "",
-        lastName: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-    };
+  const initValues = {
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    image: "",
+    role: "user",
+  };
 
-    const yupValidationScheme = Yup.object({
-        firstName: Yup.string().max(50, "Максимальна довжина 50 символів"),
-        lastName: Yup.string().max(50, "Максимальна довжина 50 символів"),
-        email: Yup.string().email("Не вірний формат пошти").required("Обов'язкове поле"),
-        password: Yup.string().min(6, "Мінімальна довжина паролю 6 символів"),
-        confirmPassword: Yup.string().oneOf([Yup.ref("password")], "Паролі не збігаються"),
-    });
+  const formSubmit = (values) => {
+    delete values.confirmPassword;
 
-    const formik = useFormik({
-        initialValues: initValues,
-        validationSchema: yupValidationScheme,
-        onSubmit: formSubmit,
-    });
+    if (!values.role) {
+      values.role = "user";
+    }
 
-    return (
-        <Container
-            sx={{
-                backgroundColor: "#ffe4e1",
-                borderRadius: 2,
-                boxShadow: 3,
-                py: 4,
-                px: 3,
-                maxWidth: "500px",
-                margin: "20px auto",
-            }}
+    const users = localStorage.getItem("users");
+    if (!users) {
+      localStorage.setItem("users", JSON.stringify([{ ...values, id: 1 }]));
+    } else {
+      const array = JSON.parse(users);
+      values.id = array[array.length - 1].id + 1;
+      array.push(values);
+      localStorage.setItem("users", JSON.stringify(array));
+    }
+
+    localStorage.setItem("auth", JSON.stringify(values));
+    navigate("/");
+  };
+
+  const formik = useFormik({
+    initialValues: initValues,
+    validationSchema: yupValidationScheme,
+    onSubmit: formSubmit,
+  });
+
+  const fieldStyle = { margin: "16px" }; // Стиль для відступів між полями
+
+  return (
+    <form onSubmit={formik.handleSubmit}>
+      <TextField
+        fullWidth
+        id="firstName"
+        name="firstName"
+        label="Ім'я"
+        value={formik.values.firstName}
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        error={formik.touched.firstName && Boolean(formik.errors.firstName)}
+        helperText={formik.touched.firstName && formik.errors.firstName}
+        style={fieldStyle}
+      />
+      <TextField
+        fullWidth
+        id="lastName"
+        name="lastName"
+        label="Прізвище"
+        value={formik.values.lastName}
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        error={formik.touched.lastName && Boolean(formik.errors.lastName)}
+        helperText={formik.touched.lastName && formik.errors.lastName}
+        style={fieldStyle}
+      />
+      <TextField
+        fullWidth
+        id="email"
+        name="email"
+        label="Email"
+        type="email"
+        value={formik.values.email}
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        error={formik.touched.email && Boolean(formik.errors.email)}
+        helperText={formik.touched.email && formik.errors.email}
+        style={fieldStyle}
+      />
+      <TextField
+        fullWidth
+        id="password"
+        name="password"
+        label="Пароль"
+        type="password"
+        value={formik.values.password}
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        error={formik.touched.password && Boolean(formik.errors.password)}
+        helperText={formik.touched.password && formik.errors.password}
+        style={fieldStyle}
+      />
+      <TextField
+        fullWidth
+        id="confirmPassword"
+        name="confirmPassword"
+        label="Підтвердити пароль"
+        type="password"
+        value={formik.values.confirmPassword}
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
+        helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
+        style={fieldStyle}
+      />
+      <TextField
+        fullWidth
+        id="image"
+        name="image"
+        label="URL зображення"
+        value={formik.values.image}
+        onChange={formik.handleChange}
+        onBlur={formik.handleBlur}
+        error={formik.touched.image && Boolean(formik.errors.image)}
+        helperText={formik.touched.image && formik.errors.image}
+        style={fieldStyle}
+      />
+      <FormControl fullWidth style={fieldStyle}>
+        <InputLabel id="role-label">Роль</InputLabel>
+        <Select
+          labelId="role-label"
+          id="role"
+          name="role"
+          value={formik.values.role}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
         >
-            <Typography
-                component="h1"
-                variant="h4"
-                sx={{
-                    color: "#d81b60",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                    marginBottom: 2,
-                }}
-            >
-                Sign up
-            </Typography>
-            <Box
-                component="form"
-                onSubmit={formik.handleSubmit}
-                sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 2,
-                }}
-            >
-                {["firstName", "lastName", "email", "password", "confirmPassword"].map((field) => (
-                    <FormControl key={field}>
-                        <FormLabel htmlFor={field} sx={{ color: "#d81b60" }}>
-                            {field.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())}
-                        </FormLabel>
-                        <TextField
-                            fullWidth
-                            id={field}
-                            name={field}
-                            type={field.toLowerCase().includes("password") ? "password" : "text"}
-                            placeholder={field === "email" ? "your@email.com" : ""}
-                            value={formik.values[field]}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            error={formik.touched[field] && Boolean(formik.errors[field])}
-                            helperText={formik.touched[field] && formik.errors[field]}
-                            sx={{
-                                "& .MuiOutlinedInput-root": {
-                                    "& fieldset": {
-                                        borderColor: "#d81b60",
-                                    },
-                                    "&:hover fieldset": {
-                                        borderColor: "#ff4081",
-                                    },
-                                },
-                            }}
-                        />
-                    </FormControl>
-                ))}
-                <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    sx={{
-                        backgroundColor: "#ff4081",
-                        "&:hover": {
-                            backgroundColor: "#d81b60",
-                        },
-                        fontWeight: "bold",
-                    }}
-                >
-                    Sign up
-                </Button>
-            </Box>
-            <Divider sx={{ my: 2, color: "#d81b60" }}>or</Divider>
-            <Typography sx={{ textAlign: "center" }}>
-                Already have an account?{" "}
-                <Link href="/login" variant="body2" sx={{ color: "#d81b60", fontWeight: "bold" }}>
-                    Login
-                </Link>
-            </Typography>
-        </Container>
-    );
+          {roles.map((role) => (
+            <MenuItem key={role} value={role}>
+              {role}
+            </MenuItem>
+          ))}
+        </Select>
+        {formik.touched.role && formik.errors.role ? (
+          <p style={{ color: "red", fontSize: "12px" }}>{formik.errors.role}</p>
+        ) : null}
+      </FormControl>
+      <Button color="primary" variant="contained" fullWidth type="submit" width>
+        Sing UP
+      </Button>
+    </form>
+  );
 };
 
-export default RegisterPage;
+export default RegistrationForm;

@@ -1,132 +1,143 @@
+import { useContext, useState } from 'react';
 import { 
     Container, 
     Typography, 
     TextField, 
-    Link, 
     FormControl, 
     FormLabel, 
     Divider,
     Button,
-    Box 
-} from "@mui/material";
-import { useFormik } from "formik";
-import * as Yup from "yup";
+    Box } from '@mui/material';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import { FieldError } from '../../components/errors/Errors';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../components/providers/AuthProvider';
 
 const LoginPage = () => {
-    const formSubmit = (values) => {
-        const users = JSON.parse(localStorage.getItem("users") || "[]");
-        const user = users.find((user) => user.email === values.email && user.password === values.password);
+    const [submitError, setSubmitError] = useState(null);
+    const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
 
-        if (user) {
-            alert("Login successful!");
-            // Тут можна додати перенаправлення або логіку для логіну
-        } else {
-            alert("Invalid email or password");
+    const formSubmit = (values) => {    
+            const localData = localStorage.getItem("users");
+            
+            if(!localData) {
+                navigate("/register");
+            }
+            const users = JSON.parse(localData);
+            const user = users.find(u => u.email === values.email);
+            
+            if(user) {
+                if(user.password === values.password) {
+                    localStorage.setItem("auth", JSON.stringify(user));
+                    login();
+                    navigate("/");
+                } else {
+                    setSubmitError("Невірний пароль");
+                }
+            } else {
+                setSubmitError(`Користувача з ${values.email} не знайдено`);
+            }
         }
-    };
-
-    const initValues = {
-        email: "",
-        password: "",
-    };
-
-    const yupValidationScheme = Yup.object({
-        email: Yup.string().email("Не вірний формат пошти").required("Обов'язкове поле"),
-        password: Yup.string().min(6, "Мінімальна довжина паролю 6 символів").required("Обов'язкове поле"),
-    });
-
-    const formik = useFormik({
-        initialValues: initValues,
-        validationSchema: yupValidationScheme,
-        onSubmit: formSubmit,
-    });
-
-    return (
-        <Container
-            sx={{
-                backgroundColor: "#ffe4e1",
-                borderRadius: 2,
-                boxShadow: 3,
-                py: 4,
-                px: 3,
-                maxWidth: "500px",
-                margin: "20px auto",
-            }}
-        >
-            <Typography
+    
+        
+        const initValues = {
+            email: "",
+            password: ""
+        };
+    
+        
+        const yupValidationScheme = Yup.object({
+            email: Yup.string().email("Не вірний формат пошти").required("Обов'язкове поле"),
+            password: Yup.string().min(6, "Мінімальна довжина паролю 6 символів")
+        });
+    
+        
+        const formik = useFormik({
+            initialValues: initValues,
+            validationSchema: yupValidationScheme,
+            onSubmit: formSubmit
+        });
+    
+        return (
+            <Container>
+             <Typography
                 component="h1"
                 variant="h4"
-                sx={{
-                    color: "#d81b60",
-                    fontWeight: "bold",
-                    textAlign: "center",
-                    marginBottom: 2,
-                }}
-            >
-                Login
-            </Typography>
-            <Box
+                sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)', textAlign: "center", m: "10px 0px" }}
+              >
+                Sign in
+              </Typography>
+
+              <Box
                 component="form"
                 onSubmit={formik.handleSubmit}
-                sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 2,
-                }}
-            >
-                {["email", "password"].map((field) => (
-                    <FormControl key={field}>
-                        <FormLabel htmlFor={field} sx={{ color: "#d81b60" }}>
-                            {field === "email" ? "Email" : "Password"}
-                        </FormLabel>
-                        <TextField
-                            fullWidth
-                            id={field}
-                            name={field}
-                            type={field === "password" ? "password" : "text"}
-                            placeholder={field === "email" ? "your@email.com" : ""}
-                            value={formik.values[field]}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            error={formik.touched[field] && Boolean(formik.errors[field])}
-                            helperText={formik.touched[field] && formik.errors[field]}
-                            sx={{
-                                "& .MuiOutlinedInput-root": {
-                                    "& fieldset": {
-                                        borderColor: "#d81b60",
-                                    },
-                                    "&:hover fieldset": {
-                                        borderColor: "#ff4081",
-                                    },
-                                },
-                            }}
-                        />
-                    </FormControl>
-                ))}
-                <Button
-                    type="submit"
+                sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+              >
+                <FormControl>
+                  <FormLabel htmlFor="email">Email</FormLabel>
+                  <TextField
+                    required
                     fullWidth
-                    variant="contained"
-                    sx={{
-                        backgroundColor: "#ff4081",
-                        "&:hover": {
-                            backgroundColor: "#d81b60",
-                        },
-                        fontWeight: "bold",
-                    }}
+                    id="email"
+                    placeholder="your@email.com"
+                    name="email"
+                    autoComplete="email"
+                    variant="outlined"
+                    onChange={formik.handleChange}
+                    value={formik.values.email}
+                    onBlur={formik.handleBlur}
+                  />
+                  {formik.touched.email && formik.errors.email ? (
+             <FieldError text={ formik.errors.email } />
+           ) : null}
+                </FormControl>
+                <FormControl>
+                  <FormLabel htmlFor="password">Password</FormLabel>
+                  <TextField
+                    required
+                    fullWidth
+                    name="password"
+                    placeholder="••••••"
+                    type="password"
+                    id="password"
+                    autoComplete="new-password"
+                    variant="outlined"
+                    onChange={formik.handleChange}
+                    value={formik.values.password}
+                    onBlur={formik.handleBlur}
+                  />
+                  {formik.touched.password && formik.errors.password ? (
+             <FieldError text={ formik.errors.password } />
+           ) : null}
+                </FormControl>
+                <Button
+                  type="submit"
+                  fullWidth
+                  variant="contained"
                 >
-                    Log in
+                  Sign in
                 </Button>
-            </Box>
-            <Divider sx={{ my: 2, color: "#d81b60" }}>or</Divider>
-            <Typography sx={{ textAlign: "center" }}>
-                Don't have an account?{" "}
-                <Link href="/register" variant="body2" sx={{ color: "#d81b60", fontWeight: "bold" }}>
+              </Box>
+              <Divider>
+                <Typography sx={{ color: 'text.secondary' }}>or</Typography>
+              </Divider>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Typography sx={{ textAlign: 'center' }}>
+                  Don't have account?{' '}
+                  <Link
+                    to="/register"
+                  >
                     Sign up
-                </Link>
-            </Typography>
-        </Container>
-    );
-};
+                  </Link>
+                </Typography>
+              </Box> 
+              <Box sx={{textAlign: "center"}}>
+                <FieldError text={submitError} />
+              </Box>
+              </Container>
+        );
+}
 
 export default LoginPage;
