@@ -1,0 +1,71 @@
+import {useEffect} from "react";
+import {Route, Routes} from "react-router-dom";
+import MainPage from "./pages/mainPage/MainPage";
+import AboutPage from "./pages/about/About";
+import RegisterPage from "./pages/register/RegisterPage";
+import NotFoundPage from "./pages/notFoundPage/NotFoundPage";
+import DefaultLayout from "./components/layouts/DefaultLayout";
+import UsersListPage from "./pages/admin/users/UsersListPage";
+import EditUserPage from "./pages/admin/users/edit/EditUserPage";
+import LoginPageWithProvider from "./pages/login";
+import AdminPanelLayout from "./components/layouts/AdminPanelLayout";
+import RoleListPage from "./pages/admin/roles/RoleListPage";
+import {useSelector} from "react-redux";
+import usersJson from "./pages/admin/users/users.json";
+import useAction from "./hooks/useAction";
+import "./App.css";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+
+const App = () => {
+    const {user, isAuth} = useSelector(state => state.auth);
+    const { login } = useAction();
+
+    useEffect(() => {
+        const localData = localStorage.getItem("users");
+        if(!localData) {
+            localStorage.setItem("users", JSON.stringify(usersJson));
+        }
+    }, []);
+
+    // login user
+    useEffect(() => {
+        const localData = localStorage.getItem("user");
+        if(localData) {
+            const user = JSON.parse(localData);
+            login(user);
+        }
+    }, []);
+
+    return (
+    <GoogleOAuthProvider clientId="454039478511-8jcuaiasctkg5b7avlvhm605vcnivvcp.apps.googleusercontent.com">
+        <Routes>
+            <Route path="/" element={<DefaultLayout/>}>
+                <Route index element={<MainPage/>}/>
+                {!isAuth && (
+                    <>
+                        <Route path="register" element={<RegisterPage/>}/>
+                        <Route path="login" element={<LoginPageWithProvider/>}/>
+                    </>
+                )}
+                <Route path="about" element={<AboutPage/>}/>
+                <Route path="*" element={<NotFoundPage/>}/>
+            </Route>
+            
+                {isAuth && user.role === "admin" && (
+                    <Route path="admin" element={<AdminPanelLayout />}>
+                        <Route path="users">
+                            <Route index element={<UsersListPage />} />
+                            <Route path="user" element={<EditUserPage isUpdate={false} />} />
+                            <Route path="user/:id" element={<EditUserPage isUpdate={true} />} />
+                        </Route>
+                        <Route path="roles" element={<RoleListPage />} />
+                    </Route>
+                )}
+        </Routes>
+        </GoogleOAuthProvider>
+    );
+    
+};
+
+export default App;
